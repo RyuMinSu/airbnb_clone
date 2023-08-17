@@ -1,0 +1,9 @@
+{% if not not_found %}
+  <h1>{{ room.name }}</h1>
+  <h3>{{ room.country }}</h3>
+  <h4>{{ room.price }}</h4>
+  <p>{{ room.description }}</p>
+  <h4>{{ room.category.name }}</h4>
+{% else %}
+  <h1>404 not found</h1>
+{% endif %}
