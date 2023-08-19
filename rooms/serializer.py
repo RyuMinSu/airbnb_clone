@@ -9,6 +9,7 @@ class AmenitySerializer(ModelSerializer):
         model = Amenity
         fields = ("name", "description",)
 
+
 class RoomDetailSerializer(ModelSerializer):
     owner = TinyUserSerializer(read_only=True)
     amenities = AmenitySerializer(many=True, read_only=True)
@@ -17,6 +18,10 @@ class RoomDetailSerializer(ModelSerializer):
     class Meta:        
         model = Room
         fields = "__all__"
+
+    # def create(self, validated_data):
+    #     print(validated_data)
+    #     return 
 
         
 class RoomListSerializer(ModelSerializer):

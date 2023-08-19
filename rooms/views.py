@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db import transaction
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -19,17 +20,28 @@ class Rooms(APIView):
         if request.user.is_authenticated: #유저인증
           serializer = RoomDetailSerializer(data=request.data)
           if serializer.is_valid():              
-              # print("request_data:", request.data)
+              
+              # -----카테고리 추가
               category_pk = request.data.get("category")
               if not category_pk: #무조건 카테고리 입력 할 수 있도록
-                  raise ParseError              
+                  raise ParseError("Category is required")
               try: #없는 카테고리를 입력할 경우
                   category = Category.objects.get(pk=category_pk)
                   if category.kind == Category.CategoryKindChoices.EXPERIENCES:
-                      raise ParseError
+                      raise ParseError("카테고리가 존재하지 않음")
               except Category.DoesNotExist:
-                  raise ParseError
+                  raise ParseError("카테고리 찾을 수 없음")
               room = serializer.save(owner=request.user, category=category) # create의 validate에 자동 추가, 카테고리 추가
+
+              # ----- amenity추가(이건 create할때 필수로 입력 안해도됨)              
+              amenities = request.data.get("amenities")
+              for amenity_pk in amenities:
+                  try:
+                    amenity = Amenity.objects.get(pk=amenity_pk)
+                  except Amenity.DoesNotExist:
+                      room.delete()
+                      raise ParseError("Amenity with id {amenity_pk} not Found")
+                  room.amenities.add(amenity)
               serializer = RoomDetailSerializer(room)
               return Response(serializer.data)
           else:
