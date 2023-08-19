@@ -12,7 +12,7 @@ urlpatterns = [
         ),
     ),
     path(
-        "<int:pk>",
+        "<int:pk>", # 꼭 pk라고 써줘야함
         views.CategoryViewSet.as_view(
             {
                 "get": "retrieve",
