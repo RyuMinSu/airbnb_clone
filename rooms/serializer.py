@@ -15,14 +15,19 @@ class RoomDetailSerializer(ModelSerializer):
     amenities = AmenitySerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
     rating = SerializerMethodField()
+    is_ownser = SerializerMethodField()
+
 
     class Meta:        
         model = Room
         fields = "__all__"
 
-    def get_rating(self, room):        
+    def get_rating(self, room):
         return room.rating()
-        
+
+    def get_is_ownser(self, room): # view에서 보낸 데이터로 새로운 method만들 수 있음
+        request = self.context['request']
+        return room.owner == request.user
 
 
     # def create(self, validated_data):
@@ -32,10 +37,16 @@ class RoomDetailSerializer(ModelSerializer):
         
 class RoomListSerializer(ModelSerializer):
     rating = SerializerMethodField()
+    is_owner = SerializerMethodField()
+
     class Meta:
         model = Room
-        fields = ("id", "country", "city", "price", "rating")
+        fields = ("id", "country", "city", "price", "rating", "is_owner")
 
     def get_rating(self, room):
         return room.rating()
+    
+    def get_is_owner(self, room):
+        request = self.context['request']
+        return room.owner == request.user
 
