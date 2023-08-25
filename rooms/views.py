@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.db import transaction
+from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -164,6 +165,7 @@ class AmenityDetail(APIView):
         amenity.delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
+
 class RoomReviews(APIView):
     def get_object(self, pk):
         try:
@@ -177,13 +179,14 @@ class RoomReviews(APIView):
             page = int(page)            
         except ValueError:
             page = 1
-        page_size = 3
+        page_size = settings.PAGE_SIZE
         start = (page-1) * 3
         end = start + page_size
         room = self.get_object(pk)
         serializer = ReviewSerializer(room.reviews.all()[start:end], many=True)
         return Response(serializer.data)
-    
+
+
 class RoomAmenities(APIView):
     def get_object(self, pk):
         try:
@@ -197,10 +200,15 @@ class RoomAmenities(APIView):
             page = int(page)
         except:
             page = 1
-        page_size = 3
+        page_size = settings.PAGE_SIZE
         start = (page-1) * 3
         end = start + page_size
         room = self.get_object(pk)
         serializer = AmenitySerializer(room.amenities.all()[start:end], many=True)
         return Response(serializer.data)
-        
+
+
+class RoomPhotos(APIView):
+    def post(self, request, pk):
+        pass
+
