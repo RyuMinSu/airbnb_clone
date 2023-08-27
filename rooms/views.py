@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.db import transaction
 from django.conf import settings
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -11,6 +12,9 @@ from .serializer import AmenitySerializer, RoomListSerializer, RoomDetailSeriali
 from categories.models import Category
 from reviews.serializer import ReviewSerializer
 from medias.serializer import PhotoSerializer
+from bookings.models import Booking
+from bookings.serializer import PublicBookingSerializer
+
 
 
 
@@ -242,4 +246,21 @@ class RoomPhotos(APIView):
             return Response(serializer.errors)
         
         
+class RoomBookings(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+    
+    def get(self, request, pk):
+        room = self.get_object(pk)
+        now = timezone.localtime(timezone.now()).date()
+        bookings = Booking.objects.filter(room=room, kind=Booking.BookingKindChoices.ROOM, check_in__gt=now,) #room에 대한 부킹찾기(현재 날짜 기준으로 미래만 보여줌)
+        serializer = PublicBookingSerializer(bookings, many=True)
+        return Response(serializer.data)
+
+
 
