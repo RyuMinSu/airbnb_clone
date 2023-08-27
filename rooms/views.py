@@ -13,7 +13,7 @@ from categories.models import Category
 from reviews.serializer import ReviewSerializer
 from medias.serializer import PhotoSerializer
 from bookings.models import Booking
-from bookings.serializer import PublicBookingSerializer
+from bookings.serializer import PublicBookingSerializer, CreateBookingSerializer
 
 
 
@@ -261,6 +261,16 @@ class RoomBookings(APIView):
         bookings = Booking.objects.filter(room=room, kind=Booking.BookingKindChoices.ROOM, check_in__gt=now,) #room에 대한 부킹찾기(현재 날짜 기준으로 미래만 보여줌)
         serializer = PublicBookingSerializer(bookings, many=True)
         return Response(serializer.data)
+    
+    def post(self, request, pk):
+        room = self.get_object(pk)
+        serializer = CreateBookingSerializer(data=request.data)
+        if serializer.is_valid(): #형식만 검증할뿐
+            booking = serializer.save(user=request.user, room=room, kind=Booking.BookingKindChoices.ROOM,)
+            serializer = PublicBookingSerializer(booking)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
 
 
