@@ -200,7 +200,6 @@ class RoomReviews(APIView):
             return Response(serializer.errors)
 
 
-
 class RoomAmenities(APIView):
     def get_object(self, pk):
         try:
