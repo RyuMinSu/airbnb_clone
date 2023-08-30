@@ -19,8 +19,24 @@ class Experience(CommonModel):
     explanations = models.ManyToManyField("experiences.Perk", related_name="experiences",)
     category = models.ForeignKey("categories.Category", on_delete=models.SET_NULL, null=True, blank=True, related_name="experiences",)
 
+
+    def average_ratings(experience):
+        reviews_count = experience.reviews.count()
+        if reviews_count == 0:
+            return 0
+        else:
+            ratings = experience.reviews.all().values("rating")
+            total_rating = 0
+            for rating in ratings:
+                total_rating += rating["rating"]
+            return (total_rating / reviews_count)
+        
+
     def __str__(self) -> str:
         return self.name
+    
+    
+
 
 class Perk(CommonModel):
     """ What is included on an Experiences"""
