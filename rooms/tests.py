@@ -3,6 +3,7 @@ from rest_framework.test import APITestCase
 from . import models
 
 
+#----- Amenity
 class TestAmenities(APITestCase):
 	NAME = "Amenity Test"
 	DESC = "Amenity Description"
@@ -13,8 +14,7 @@ class TestAmenities(APITestCase):
 	
 	def test_all_amenities(self):
 		response = self.client.get(self.URL)
-		data = response.json()
-		print(data)
+		data = response.json()		
 		# get으로 접속 되는지
 		self.assertEqual(response.status_code, 200, msg="wrong")
 		# 반환되는 data가 list가 맞는지
@@ -48,3 +48,36 @@ class TestAmenities(APITestCase):
 		self.assertIn("name", data)
 
 
+#----- Amenity Detail
+class TestAmenity(APITestCase):
+	NAME = "Amenity Test"
+	DESC = "Amenity Description"
+
+	def setUp(self):
+		models.Amenity.objects.create(name=self.NAME, description=self.DESC,)
+
+	#----- get_object
+	def test_amenity_not_found(self):
+		# False
+		response = self.client.get("/api/v1/rooms/amenities/2")
+		self.assertEqual(response.status_code, 404, "have to 404")
+
+	#------ get
+	def test_get_amenity(self):		
+		# get_object == True
+		response = self.client.get("/api/v1/rooms/amenities/1")
+		data = response.json()
+		#----- get일 경우
+		# 잘 작동하는지
+		self.assertEqual(response.status_code, 200, "dpd")
+		# 잘 받아오는지
+		self.assertEqual(data["name"], self.NAME, "not name")
+		self.assertEqual(data["description"], self.DESC, "not desc")
+
+	#----- delete
+	def test_delete_amenity(self):
+		response = self.client.delete("/api/v1/rooms/amenities/1")
+		self.assertEqual(response.status_code, 204)
+
+
+		
