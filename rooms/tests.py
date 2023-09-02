@@ -79,5 +79,32 @@ class TestAmenity(APITestCase):
 		response = self.client.delete("/api/v1/rooms/amenities/1")
 		self.assertEqual(response.status_code, 204)
 
+	#----- put
+	def test_put_amenity(self):
+		update_name = "new_amenity2"
+		update_desc = "new_desc2"
+		update_name_over150 = "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+		
+
+		#----- 데이터 입력 됐을때
+		# get_object == True
+		response = self.client.put("/api/v1/rooms/amenities/1", data={"name": update_name, "description": update_desc},)
+		data = response.json()
+		# 잘 동작 하는지
+		self.assertEqual(response.status_code, 200, "update error")
+		#잘 변경됐는지
+		self.assertEqual(data["name"], update_name, "update name wrong")
+		self.assertEqual(data["description"], update_desc, "update desc wrong")
+
+		#----- 데이터 입력 안됐을때
+		response = self.client.put("/api/v1/rooms/amenities/1", data={"name": update_name_over150})
+		# badrequest 나오는지
+		self.assertEqual(response.status_code, 400, "not bad request")
+		# serializer.errors 나오는지
+		self.assertIn("name", response.json())
+
+
+
+
 
 		
