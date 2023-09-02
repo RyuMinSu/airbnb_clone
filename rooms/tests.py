@@ -1,6 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APITestCase
 from . import models
+from users.models import User
 
 
 #----- Amenity
@@ -85,7 +86,6 @@ class TestAmenity(APITestCase):
 		update_desc = "new_desc2"
 		update_name_over150 = "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
 		
-
 		#----- 데이터 입력 됐을때
 		# get_object == True
 		response = self.client.put("/api/v1/rooms/amenities/1", data={"name": update_name, "description": update_desc},)
@@ -104,7 +104,23 @@ class TestAmenity(APITestCase):
 		self.assertIn("name", response.json())
 
 
-
+#----- Rooms
+class TestRooms(APITestCase):
+	def setUp(self):
+		user = User.objects.create(username="test")
+		user.set_password = "123"
+		user.save()
+		self.user = user
+		
+	def test_create_room(self):
+		# 로그인 안한상태
+		response = self.client.post("/api/v1/rooms/")
+		self.assertEqual(response.status_code, 403)
+		
+		# 로그인 한상태
+		self.client.force_login(self.user)
+		response = self.client.post("/api/v1/rooms/")
+		print(response)
 
 
 		
