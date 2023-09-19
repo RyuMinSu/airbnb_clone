@@ -179,3 +179,6 @@ CORS_ALLOWED_ORIGINS =[
 
 # django access cokie from js
 CORS_ALLOW_CREDENTIALS = True
+
+# csrf trust
+CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:3000"]
