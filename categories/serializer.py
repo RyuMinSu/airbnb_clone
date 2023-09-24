@@ -5,7 +5,7 @@ from .models import Category
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ("name", "kind")
+        fields = ("pk", "name", "kind")
         # fields = ("name", "kind")
         # exclude = ("create_at")
         
